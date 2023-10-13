@@ -5,9 +5,8 @@ app.use(express.json());
 const port = 3000
 const path = '/api'
 
-import * as actor from './routes/actor/actor.js';
+import * as person from './routes/person/person.js';
 import * as movie from './routes/movie/movie.js';
-import * as realisator from './routes/realisator/realisator.js';
 
 
 app.listen(port, () => {
@@ -15,19 +14,19 @@ app.listen(port, () => {
 });
 
 
-// --- ACTOR ---
+// --- PERSON ---
 // create
-app.post(`${path}/actor`, actor.createOne(request, response));
+app.post(`${path}/person`, person.createOne(request, response));
 
 // read
-app.get(`${path}/actor`, actor.readOne(request, response));
-app.get(`${path}/actor/:id`, actor.readAll(request, response)); 
+app.get(`${path}/person`, person.readOne(request, response));
+app.get(`${path}/person/:id`, person.readAll(request, response)); 
 
 // update
-app.patch(`${path}/actor/:id`, actor.updateOne(request, response));
+app.patch(`${path}/person/:id`, person.updateOne(request, response));
 
 // delete
-app.delete(`${path}/actor/:id`, actor.deleteOne(request, response));
+app.delete(`${path}/person/:id`, person.deleteOne(request, response));
 
 
 // --- MOVIE ---
@@ -44,17 +43,3 @@ app.patch(`${path}/movie/:id`, movie.updateOne(request, response));
 // delete
 app.delete(`${path}/movie/:id`, movie.deleteOne(request, response));
 
-
-// --- REALISATOR ---
-// create
-app.post(`${path}/realisator`, realisator.createOne(request, response));
-
-// read
-app.get(`${path}/realisator`, realisator.readOne(request, response));
-app.get(`${path}/realisator/:id`, realisator.readAll(request, response)); 
-
-// update
-app.patch(`${path}/realisator/:id`, realisator.updateOne(request, response));
-
-// delete
-app.delete(`${path}/realisator/:id`, realisator.deleteOne(request, response));

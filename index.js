@@ -5,8 +5,8 @@ app.use(express.json());
 const port = 3000
 const path = '/api'
 
-import * as person from './routes/person/person.js';
-import * as movie from './routes/movie/movie.js';
+const person = require('./routes/person/person.js');
+const movie = require('./routes/movie/movie.js');
 
 
 app.listen(port, () => {
@@ -16,30 +16,30 @@ app.listen(port, () => {
 
 // --- PERSON ---
 // create
-app.post(`${path}/person`, person.createOne(request, response));
+app.post(`${path}/person`, person.createOne);
 
 // read
-app.get(`${path}/person`, person.readOne(request, response));
-app.get(`${path}/person/:id`, person.readAll(request, response)); 
+app.get(`${path}/person`, person.readAll);
+app.get(`${path}/person/:id`, person.readOne); 
 
 // update
-app.patch(`${path}/person/:id`, person.updateOne(request, response));
+app.patch(`${path}/person/:id`, person.updateOne);
 
 // delete
-app.delete(`${path}/person/:id`, person.deleteOne(request, response));
+app.delete(`${path}/person/:id`, person.deleteOne);
 
 
 // --- MOVIE ---
 // create
-app.post(`${path}/movie`, movie.createOne(request, response));
+app.post(`${path}/movie`, movie.createOne);
 
 // read
-app.get(`${path}/movie`, movie.readOne(request, response));
-app.get(`${path}/movie/:id`, movie.readAll(request, response)); 
+app.get(`${path}/movie`, movie.readAll);
+app.get(`${path}/movie/:id`, movie.readOne); 
 
 // update
-app.patch(`${path}/movie/:id`, movie.updateOne(request, response));
+app.patch(`${path}/movie/:id`, movie.updateOne);
 
 // delete
-app.delete(`${path}/movie/:id`, movie.deleteOne(request, response));
+app.delete(`${path}/movie/:id`, movie.deleteOne);
 

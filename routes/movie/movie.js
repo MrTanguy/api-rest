@@ -1,19 +1,49 @@
-export function createOne (request, response) {
+function createOne (request, response) {
     
 }
 
-export function readOne (request, response) {
+function readOne (request, response) {
     //request.params.id
 }
 
-export function readAll (request, response) {
+function readAll (request, response) {
 
 }
 
-export function updateOne (request, response) {
+function updateOne (request, response) {
 
 }
 
-export function deleteOne (request, response) {
+function deleteOne (request, response) {
 
 }
+
+function createOne(request, response) {
+    // ...
+}
+
+function readOne(request, response) {
+    // request.params.id
+    // ...
+}
+
+function readAll(request, response) {
+    // ...
+}
+
+function updateOne(request, response) {
+    // ...
+}
+
+function deleteOne(request, response) {
+    // ...
+}
+
+module.exports = {
+    createOne,
+    readOne,
+    readAll,
+    updateOne,
+    deleteOne
+};
+

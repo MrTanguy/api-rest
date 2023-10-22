@@ -19,8 +19,14 @@ const person = Joi.object({
 })
 
 const convertDate = (date) => {
-    const day = date.getDate()
-    const month = date.getMonth() + 1
+    let day = date.getDate()
+    if (day <= 9) {
+        day = `0${day}`
+    }
+    let month = date.getMonth() + 1
+    if (month <= 9) {
+        month = `0${month}`
+    }
     const year = date.getFullYear()
 
     return `${year}-${month}-${day}`
@@ -49,7 +55,7 @@ function createOne(request, response) {
                 response.status(400).send('Something wrong happened !\n' + err);
             }
             db.query(
-                `INSERT INTO \`api-rest\`.\`person\` (lastname, firstname, birthdate) VALUES ('${request.body.lastname}', '${request.body.firstname}', DATE('${request.body.birthdate}'));`, 
+                `INSERT INTO \`api-rest\`.\`person\` (lastname, firstname, birthdate) VALUES ('${request.body.lastname.toUpperCase()}', '${request.body.firstname.toLowerCase()}', DATE('${request.body.birthdate}'));`, 
                 (err, _) => {
                     if (err) {
                         response.status(400).send('Something wrong happened !\n' + err)
@@ -86,7 +92,28 @@ function readOne(request, response) {
 }
 
 function readAll(request, response) {
-    // ...
+
+    const db = connection()
+
+    db.connect(function(err) {
+        if (err) {
+            response.send('Something wrong happened !\n' + err);
+        }
+        db.query(
+            `SELECT id_person, lastname, firstname, birthdate FROM \`api-rest\`.\`person\` LIMIT 20`,
+            (err, result) => {
+                db.end()
+                if (err) {
+                    return response.status(400).send('Something wrong happened !\n' + err)
+                } else {
+                    for (const person of result) {
+                        person["birthdate"] = convertDate(person["birthdate"])
+                    }
+                    return response.status(200).send(result)
+                }
+            }
+        );
+    });
 }
 
 function updateOne(request, response) {

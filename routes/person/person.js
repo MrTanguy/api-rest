@@ -41,9 +41,9 @@ function createOne(request, response) {
     // On retourne des erreurs 
     if (validator.error) {
         if (validator.error.details[0].message.includes("birthdate")) {
-            response.status(400).send("Birthdate must follow this format : YYYY-MM-DD");
+            return response.status(400).send("Birthdate must follow this format : YYYY-MM-DD");
         } else {
-            response.status(400).send(validator.error.details[0].message)
+            return response.status(400).send(validator.error.details[0].message)
         }
     } else {
 
@@ -52,15 +52,15 @@ function createOne(request, response) {
         // On envoie les données en BDD
         db.connect(function(err) {
             if (err) {
-                response.status(400).send('Something wrong happened !\n' + err);
+                return response.status(400).send('Something wrong happened !\n' + err);
             }
             db.query(
                 `INSERT INTO \`api-rest\`.\`person\` (lastname, firstname, birthdate) VALUES ('${request.body.lastname}', '${request.body.firstname}', DATE('${request.body.birthdate}'));`, 
-                (err, _) => {
+                (err, result) => {
                     if (err) {
-                        response.status(400).send('Something wrong happened !\n' + err)
+                        return response.status(400).send('Something wrong happened !\n' + err)
                     } else {
-                        response.status(201).send(`${request.body.lastname} ${request.body.firstname} created !`)
+                        return response.status(201).send(`[id : ${result['insertId']}] ${request.body.lastname} ${request.body.firstname} created !`)
                     }
                 }
             );
@@ -74,7 +74,7 @@ function readOne(request, response) {
 
     db.connect(function(err) {
         if (err) {
-            response.send('Something wrong happened !\n' + err);
+            return response.send('Something wrong happened !\n' + err);
         }
         db.query(
             `SELECT id_person, lastname, firstname, birthdate FROM \`api-rest\`.\`person\` WHERE id_person = ${request.params.id}`,
@@ -84,7 +84,7 @@ function readOne(request, response) {
                     return response.status(400).send('Something wrong happened !\n' + err)
                 } else {
                     if (result.length === 0){
-                        return response.status(200).send(`Id : ${request.params.id} no found`)
+                        return response.status(200).send(`Id : ${request.params.id} not found`)
                     } else {
                         result[0]["birthdate"] = convertDate(result[0]["birthdate"])
                         return response.status(200).send(result)
@@ -95,16 +95,25 @@ function readOne(request, response) {
     });
 }
 
-function readAll(_, response) {
+function readAll(request, response) {
+
+    // Gestion du possible query parameter limit
+    const limit = () => {
+        if (!isNaN(request.query.limit) && parseInt(request.query.limit) == request.query.limit) {
+            return request.query.limit
+        } else {
+            return 20
+        }
+    }
 
     const db = connection()
 
     db.connect(function(err) {
         if (err) {
-            response.send('Something wrong happened !\n' + err);
+            return response.send('Something wrong happened !\n' + err);
         }
         db.query(
-            `SELECT id_person, lastname, firstname, birthdate FROM \`api-rest\`.\`person\` LIMIT 20`,
+            `SELECT id_person, lastname, firstname, birthdate FROM \`api-rest\`.\`person\` LIMIT ${limit()}`,
             (err, result) => {
                 db.end()
                 if (err) {
@@ -134,9 +143,9 @@ function updateOne(request, response) {
     // On retourne des erreurs 
     if (validator.error) {
         if (validator.error.details[0].message.includes("birthdate")) {
-            response.status(400).send("Birthdate must follow this format : YYYY-MM-DD");
+            return response.status(400).send("Birthdate must follow this format : YYYY-MM-DD");
         } else {
-            response.status(400).send(validator.error.details[0].message)
+            return response.status(400).send(validator.error.details[0].message)
         }
     } else {
 
@@ -152,7 +161,7 @@ function updateOne(request, response) {
         // Envoie en BDD
         db.connect(function(err) {
             if (err) {
-                response.send('Something wrong happened !\n' + err);
+                return response.send('Something wrong happened !\n' + err);
             }
             db.query(
                 `UPDATE \`api-rest\`.\`person\` SET ${params} WHERE id_person = ${request.params.id}`,
@@ -175,7 +184,7 @@ function deleteOne(request, response) {
 
     db.connect(function(err) {
         if (err) {
-            response.send('Something wrong happened !\n' + err);
+            return response.send('Something wrong happened !\n' + err);
         }
         db.query(
             `DELETE FROM \`api-rest\`.\`person\` WHERE id_person = ${request.params.id}`,

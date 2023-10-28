@@ -180,14 +180,82 @@ function readOne (request, response) {
             }
         );
     });
-
 }
 
 function readAll (request, response) {
 
-    
+    // Gestion du possible query parameter limit
+    const limit = () => {
+        if (!isNaN(request.query.limit) && parseInt(request.query.limit) == request.query.limit) {
+            return request.query.limit
+        } else {
+            return 20
+        }
+    }
 
+    const db = connection();
+
+    db.connect(function(err) {
+        if (err) {
+            return response.send('Something wrong happened !\n' + err);
+        }
+
+        db.query(
+            `SELECT
+                m.id_movie,
+                m.name,
+                m.description,
+                m.release_date,
+                p.id_person,
+                p.firstname,
+                p.lastname,
+                r.role
+            FROM \`api-rest\`.\`movie\` m
+            LEFT JOIN \`api-rest\`.\`role\` r ON m.id_movie = r.id_movie
+            LEFT JOIN \`api-rest\`.\`person\` p ON r.id_person = p.id_person
+            LIMIT = ${limit()}`,
+            (err, result) => {
+                db.end();
+                if (err) {
+                    return response.status(400).send('Something wrong happened !\n' + err);
+                } else {
+                    const movies = {};
+
+                    for (let row of result) {
+                        if (!movies[row.id_movie]) {
+                            movies[row.id_movie] = {
+                                id_movie: row.id_movie,
+                                name: row.name,
+                                description: row.description,
+                                release_date: row.release_date,
+                                actors: [],
+                                realisators: []
+                            };
+                        }
+
+                        const person = {
+                            id_person: row.id_person,
+                            firstname: row.firstname,
+                            lastname: row.lastname
+                        };
+
+                        if (row.role === 1) {
+                            movies[row.id_movie].actors.push(person);
+                        } else if (row.role === 2) {
+                            movies[row.id_movie].realisators.push(person);
+                        } else if (row.role === 3) {
+                            movies[row.id_movie].actors.push(person);
+                            movies[row.id_movie].realisators.push(person);
+                        }
+                    }
+
+                    return response.send(Object.values(movies));
+                }
+            }
+        );
+    });
 }
+
 
 function updateOne (request, response) {
 

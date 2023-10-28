@@ -82,13 +82,11 @@ function readOne(request, response) {
                 db.end()
                 if (err) {
                     return response.status(400).send('Something wrong happened !\n' + err)
+                } else if (result.length === 0){
+                    return response.status(200).send(`Id : ${request.params.id} not found`)
                 } else {
-                    if (result.length === 0){
-                        return response.status(200).send(`Id : ${request.params.id} not found`)
-                    } else {
-                        result[0]["birthdate"] = convertDate(result[0]["birthdate"])
-                        return response.status(200).send(result)
-                    }
+                    result[0]["birthdate"] = convertDate(result[0]["birthdate"])
+                    return response.status(200).send(result)
                 }
             }
         );

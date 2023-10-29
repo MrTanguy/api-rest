@@ -193,6 +193,35 @@ function readAll (request, response) {
         }
     }
 
+    const actors = () => {
+        let actorIds = request.query.actors ? request.query.actors.split(',').map(Number) : [];
+        return actorIds.filter(item => typeof item === 'number' && !isNaN(item));
+    }
+    
+    const realisators = () => {
+        let realisatorIds = request.query.realisators ? request.query.realisators.split(',').map(Number) : [];
+        return realisatorIds.filter(item => typeof item === 'number' && !isNaN(item));
+    }
+
+    const actorIds = actors();
+    const realisatorIds = realisators();
+
+    let whereClauses = [];
+    let queryParams = [];
+
+    if (actorIds.length) {
+        whereClauses.push(`r.id_person IN (${actorIds.join(', ')}) AND r.role IN (1, 3)`);
+        queryParams.push(actorIds);
+    }
+
+    if (realisatorIds.length) {
+        whereClauses.push(`r.id_person IN (${realisatorIds.join(', ')}) AND r.role IN (2, 3)`);
+        queryParams.push(realisatorIds);
+    }
+
+    const whereString = whereClauses.length ? 'WHERE ' + whereClauses.join(' OR ') : '';
+
+
     const db = connection();
 
     db.connect(function(err) {
@@ -215,7 +244,8 @@ function readAll (request, response) {
                 LIMIT ${limit()}
             ) AS m
             LEFT JOIN \`api-rest\`.\`role\` r ON m.id_movie = r.id_movie
-            LEFT JOIN \`api-rest\`.\`person\` p ON r.id_person = p.id_person;`,
+            LEFT JOIN \`api-rest\`.\`person\` p ON r.id_person = p.id_person
+            ${whereString}`,
             (err, result) => {
                 db.end();
                 if (err) {
@@ -378,6 +408,25 @@ function updateOne(request, response) {
 
 
 function deleteOne (request, response) {
+
+    const db = connection()
+
+    db.connect(function(err) {
+        if (err) {
+            return response.send('Something wrong happened !\n' + err);
+        }
+        db.query(
+            `DELETE FROM \`api-rest\`.\`movie\` WHERE id_movie = ${request.params.id}`,
+            (err, result) => {
+                db.end()
+                if (err) {
+                    return response.status(400).send('Something wrong happened !\n' + err)
+                } else {
+                    return response.status(200).send('Movie deleted !')
+                }
+            }
+        );
+    });
 
 }
 

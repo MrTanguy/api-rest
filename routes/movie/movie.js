@@ -18,8 +18,8 @@ function createOne (request, response) {
         name: Joi.string().max(128).required(),
         description: Joi.string().max(2048).required(),
         release_date: Joi.date().iso().required(),
-        actors: Joi.array().optional(),
-        realisators: Joi.array().optional()
+        actors: Joi.array().items(Joi.number()).optional(),
+        realisators: Joi.array().items(Joi.number()).optional()
     })
 
     // On vérifie la donnée
@@ -258,10 +258,124 @@ function readAll (request, response) {
     });
 }
 
+function updateOne(request, response) {
+    // Schéma de validation
+    const movieSchema = Joi.object({
+        name: Joi.string().max(128).optional(),
+        description: Joi.string().max(2048).optional(),
+        release_date: Joi.date().iso().optional(),
+        actors: Joi.array().items(Joi.number()).optional(),
+        realisators: Joi.array().items(Joi.number()).optional()
+    });
 
-function updateOne (request, response) {
+    // Valider la requête avec le schéma
+    const { error, value } = movieSchema.validate(request.body);
 
+    // Si la validation échoue, renvoyez une erreur
+    if (error) {
+        return response.status(400).send('Invalid input: ' + error.details[0].message);
+    }
+
+    // Gestion des paramètres
+    const updates = [];
+    const values = [];
+    
+    if (value.name) {
+        updates.push('name = ?');
+        values.push(value.name);
+    }
+    
+    if (value.description) {
+        updates.push('description = ?');
+        values.push(value.description);
+    }
+
+    if (value.release_date) {
+        updates.push('release_date = ?');
+        values.push(value.release_date);
+    }
+
+    if (!updates.length) {
+        return response.status(400).send('Aucun champ n\'a été mis à jour.');
+    }
+
+    values.push(request.params.id);
+
+    const rolesMap = {};
+
+    // Traitement des rôles
+    (value.actors || []).forEach(id => {
+        if (rolesMap[id]) {
+            rolesMap[id].role = 3;
+        } else {
+            rolesMap[id] = { id_person: id, role: 1 };
+        }
+    });
+
+    (value.realisators || []).forEach(id => {
+        if (rolesMap[id]) {
+            rolesMap[id].role = 3;
+        } else {
+            rolesMap[id] = { id_person: id, role: 2 };
+        }
+    });
+
+    const rolesToInsert = Object.values(rolesMap);
+
+    const db = connection();
+
+    db.connect(err => {
+        if (err) {
+            return response.send('Error connecting to the database:\n' + err);
+        }
+
+        // Mise à jour du film
+        db.query(`UPDATE \`api-rest\`.\`movie\` SET ${updates.join(', ')} WHERE id_movie = ?`, 
+            values, 
+            (err, result) => {
+                if (err) {
+                    return response.status(400).send('Error updating movie:\n' + err);
+                }
+
+                // Si des rôles sont fournis, mise à jour de la table role
+                if (rolesToInsert.length) {
+                    db.query(`DELETE FROM \`api-rest\`.\`role\` WHERE id_movie = ${request.params.id}`, 
+                    (err, result) => {
+                        if (err) {
+                            return response.status(400).send('Error deleting roles:\n' + err);
+                        }
+
+                        // Insertion des nouveaux rôles
+                        const roleQueries = rolesToInsert.map(role => {
+                            return new Promise((resolve, reject) => {
+                                db.query(`INSERT INTO \`api-rest\`.\`role\` (id_movie, id_person, role) VALUES (${request.params.id}, ${role.id_person}, ${role.role})`, 
+                                    (err, result) => {
+                                        if (err) reject('Error adding role:\n' + err);
+                                        resolve(result);
+                                    }
+                                );
+                            });
+                        });
+
+                        Promise.all(roleQueries)
+                            .then(() => {
+                                response.send('Movie and roles updated successfully.');
+                                db.end();
+                            })
+                            .catch(err => {
+                                response.status(400).send(err);
+                                db.end();
+                            });
+                    });
+                } else {
+                    response.send('Movie updated successfully.');
+                    db.end();
+                }
+            }
+        );
+    });
 }
+
 
 function deleteOne (request, response) {
 

@@ -1,5 +1,23 @@
 const express = require('express');
 const app = express ();
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Mon API avec Swagger',
+      version: '1.0.0',
+    },
+  },
+  // Chemin vers les fichiers API
+  apis: ['./routes/*/*.js'],
+};
+
+const specs = swaggerJsdoc(options);
+const swaggerUi = require('swagger-ui-express');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(express.json());
 
 const port = 3000

@@ -27,6 +27,51 @@ const convertDate = (date) => {
 }
 
 
+/**
+ * @swagger
+ * /api/person:
+ *   post:
+ *     summary: Crée une nouvelle personne
+ *     description: Ajoute une nouvelle personne à la base de données.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstname
+ *               - lastname
+ *               - birthdate
+ *             properties:
+ *               firstname:
+ *                 type: string
+ *                 maxLength: 255
+ *                 description: Prénom de la personne.
+ *               lastname:
+ *                 type: string
+ *                 maxLength: 255
+ *                 description: Nom de la personne.
+ *               birthdate:
+ *                 type: string
+ *                 format: date
+ *                 description: Date de naissance de la personne. Doit suivre le format YYYY-MM-DD.
+ *     responses:
+ *       201:
+ *         description: Personne créée avec succès.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "[id : 1] Doe John created!"
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Birthdate must follow this format : YYYY-MM-DD"
+ */
 function createOne(request, response) {
 
     const person = Joi.object({
@@ -68,6 +113,56 @@ function createOne(request, response) {
     }    
 }
 
+
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   get:
+ *     summary: Récupère les détails d'une personne spécifique
+ *     description: Retourne les détails d'une personne par son ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID de la personne à récupérer.
+ *     responses:
+ *       200:
+ *         description: Détails de la personne.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_person:
+ *                   type: integer
+ *                   description: ID de la personne.
+ *                 lastname:
+ *                   type: string
+ *                   description: Nom de la personne.
+ *                 firstname:
+ *                   type: string
+ *                   description: Prénom de la personne.
+ *                 birthdate:
+ *                   type: string
+ *                   format: date
+ *                   description: Date de naissance de la personne.
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\nError Message"
+ *       404:
+ *         description: Personne non trouvée.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Id : 1 not found"
+ */
 function readOne(request, response) {
 
     const db = connection()
@@ -93,6 +188,52 @@ function readOne(request, response) {
     });
 }
 
+
+/**
+ * @swagger
+ * /api/person:
+ *   get:
+ *     summary: Récupère les détails de toutes les personnes
+ *     description: Retourne les détails de toutes les personnes jusqu'à une limite spécifiée ou par défaut à 20.
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         required: false
+ *         description: Limite du nombre de personnes à récupérer.
+ *     responses:
+ *       200:
+ *         description: Liste des détails des personnes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_person:
+ *                     type: integer
+ *                     description: ID de la personne.
+ *                   lastname:
+ *                     type: string
+ *                     description: Nom de la personne.
+ *                   firstname:
+ *                     type: string
+ *                     description: Prénom de la personne.
+ *                   birthdate:
+ *                     type: string
+ *                     format: date
+ *                     description: Date de naissance de la personne.
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\nError Message"
+ */
 function readAll(request, response) {
 
     // Gestion du possible query parameter limit
@@ -127,6 +268,55 @@ function readAll(request, response) {
     });
 }
 
+
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   patch:
+ *     summary: Met à jour les détails d'une personne
+ *     description: Met à jour les détails d'une personne spécifiée par son ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID de la personne à mettre à jour.
+ *       - in: body
+ *         name: person
+ *         schema:
+ *           type: object
+ *           properties:
+ *             firstname:
+ *               type: string
+ *               maxLength: 255
+ *               description: Prénom de la personne.
+ *             lastname:
+ *               type: string
+ *               maxLength: 255
+ *               description: Nom de la personne.
+ *             birthdate:
+ *               type: string
+ *               format: date
+ *               description: Date de naissance de la personne.
+ *         required: false
+ *         description: Détails de la personne à mettre à jour.
+ *     responses:
+ *       200:
+ *         description: Personne mise à jour avec succès.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "User updated !"
+ *       400:
+ *         description: Une erreur est survenue lors de la mise à jour.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\nError Message"
+ */
 function updateOne(request, response) {
 
     const person = Joi.object({
@@ -176,6 +366,36 @@ function updateOne(request, response) {
     }
 }
 
+
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   delete:
+ *     summary: Supprime une personne
+ *     description: Supprime une personne spécifiée par son ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID de la personne à supprimer.
+ *     responses:
+ *       200:
+ *         description: Personne supprimée avec succès.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "User deleted !"
+ *       400:
+ *         description: Une erreur est survenue lors de la suppression.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\nError Message"
+ */
 function deleteOne(request, response) {
     
     const db = connection()

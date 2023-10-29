@@ -12,6 +12,64 @@ const connection = () => {
     });
 }
 
+/**
+ * @swagger
+ * /api/movie:
+ *   post:
+ *     summary: Créer un nouveau film
+ *     description: Ajoute un film à la base de données
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - description
+ *               - release_date
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Le nom du film.
+ *                 example: "Inception"
+ *               description:
+ *                 type: string
+ *                 description: La description du film.
+ *                 example: "Un film d'action et d'aventure."
+ *               release_date:
+ *                 type: string
+ *                 format: date
+ *                 description: Date de sortie du film.
+ *                 example: "2010-07-16"
+ *               actors:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                 description: Liste des IDs des acteurs du film.
+ *                 example: [1, 2]
+ *               realisators:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                 description: Liste des IDs des réalisateurs du film.
+ *                 example: [3]
+ *     responses:
+ *       200:
+ *         description: Retourne un message de confirmation.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Movie : registered !\n1 with role 1 : successfully linked to the Inception\n..."
+ *       400:
+ *         description: Retourne une erreur.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\n[erreur spécifique]"
+ */
 function createOne (request, response) {
    
     const movie = Joi.object({
@@ -106,6 +164,67 @@ function createOne (request, response) {
     }    
 }
 
+
+/**
+ * @swagger
+ * /api/movie/{id}:
+ *   get:
+ *     summary: Récupère les détails d'un film spécifique
+ *     description: Retourne les détails d'un film, y compris les acteurs et les réalisateurs associés
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID du film
+ *     responses:
+ *       200:
+ *         description: Les détails du film
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_movie:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 release_date:
+ *                   type: string
+ *                   format: date
+ *                 actors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id_person:
+ *                         type: integer
+ *                       firstname:
+ *                         type: string
+ *                       lastname:
+ *                         type: string
+ *                 realisators:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id_person:
+ *                         type: integer
+ *                       firstname:
+ *                         type: string
+ *                       lastname:
+ *                         type: string
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\n[erreur spécifique]"
+ */
 function readOne (request, response) {
     
     const db = connection()
@@ -182,6 +301,78 @@ function readOne (request, response) {
     });
 }
 
+
+/**
+ * @swagger
+ * /api/movie:
+ *   get:
+ *     summary: Récupère la liste des films
+ *     description: Retourne une liste de films, possiblement filtrée par acteurs et/ou réalisateurs, avec une option de limite
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Limite le nombre de films retournés. Par défaut à 20.
+ *       - in: query
+ *         name: actors
+ *         schema:
+ *           type: string
+ *         description: Liste des IDs d'acteurs pour filtrer les films. IDs séparés par des virgules.
+ *       - in: query
+ *         name: realisators
+ *         schema:
+ *           type: string
+ *         description: Liste des IDs de réalisateurs pour filtrer les films. IDs séparés par des virgules.
+ *     responses:
+ *       200:
+ *         description: Une liste de films
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_movie:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   release_date:
+ *                     type: string
+ *                     format: date
+ *                   actors:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id_person:
+ *                           type: integer
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *                   realisators:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id_person:
+ *                           type: integer
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\n[erreur spécifique]"
+ */
 function readAll (request, response) {
 
     // Gestion du possible query parameter limit
@@ -293,6 +484,58 @@ function readAll (request, response) {
     });
 }
 
+
+/**
+ * @swagger
+ * /api/movie/{id}:
+ *   patch:
+ *     summary: Met à jour un film et ses rôles associés
+ *     description: Met à jour les détails d'un film et, si fournis, ses acteurs et/ou réalisateurs associés, basé sur l'ID du film donné.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID du film à mettre à jour
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               release_date:
+ *                 type: string
+ *                 format: date
+ *               actors:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *               realisators:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Le film et les rôles ont été mis à jour avec succès.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Movie and roles updated successfully."
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid input: [message d'erreur spécifique]"
+ */
 function updateOne(request, response) {
     // Schéma de validation
     const movieSchema = Joi.object({
@@ -412,6 +655,35 @@ function updateOne(request, response) {
 }
 
 
+/**
+ * @swagger
+ * /api/movie/{id}:
+ *   delete:
+ *     summary: Supprime un film
+ *     description: Supprime un film basé sur l'ID du film donné.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID du film à supprimer
+ *     responses:
+ *       200:
+ *         description: Film supprimé avec succès.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Movie deleted!"
+ *       400:
+ *         description: Une erreur est survenue
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Something wrong happened !\n[message d'erreur spécifique]"
+ */
 function deleteOne (request, response) {
 
     const db = connection()

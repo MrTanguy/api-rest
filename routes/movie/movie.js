@@ -210,10 +210,12 @@ function readAll (request, response) {
                 p.firstname,
                 p.lastname,
                 r.role
-            FROM \`api-rest\`.\`movie\` m
+            FROM (
+                SELECT * FROM \`api-rest\`.\`movie\` 
+                LIMIT ${limit()}
+            ) AS m
             LEFT JOIN \`api-rest\`.\`role\` r ON m.id_movie = r.id_movie
-            LEFT JOIN \`api-rest\`.\`person\` p ON r.id_person = p.id_person
-            LIMIT = ${limit()}`,
+            LEFT JOIN \`api-rest\`.\`person\` p ON r.id_person = p.id_person;`,
             (err, result) => {
                 db.end();
                 if (err) {

@@ -3,6 +3,12 @@ const Joi = require('joi');
 const mysql = require('mysql');
 dotenv.config();
 
+/**
+ * @swagger
+ * tags:
+ *   name: movie
+ *   description: Opérations liées aux films
+ */
 
 const connection = () => {
     return mysql.createConnection({
@@ -16,6 +22,7 @@ const connection = () => {
  * @swagger
  * /api/movie:
  *   post:
+ *     tags: [movie]
  *     summary: Créer un nouveau film
  *     description: Ajoute un film à la base de données
  *     requestBody:
@@ -169,6 +176,7 @@ function createOne (request, response) {
  * @swagger
  * /api/movie/{id}:
  *   get:
+ *     tags: [movie]
  *     summary: Récupère les détails d'un film spécifique
  *     description: Retourne les détails d'un film, y compris les acteurs et les réalisateurs associés
  *     parameters:
@@ -306,6 +314,7 @@ function readOne (request, response) {
  * @swagger
  * /api/movie:
  *   get:
+ *     tags: [movie]
  *     summary: Récupère la liste des films
  *     description: Retourne une liste de films, possiblement filtrée par acteurs et/ou réalisateurs, avec une option de limite
  *     parameters:
@@ -489,6 +498,7 @@ function readAll (request, response) {
  * @swagger
  * /api/movie/{id}:
  *   patch:
+ *     tags: [movie]
  *     summary: Met à jour un film et ses rôles associés
  *     description: Met à jour les détails d'un film et, si fournis, ses acteurs et/ou réalisateurs associés, basé sur l'ID du film donné.
  *     parameters:
@@ -659,6 +669,7 @@ function updateOne(request, response) {
  * @swagger
  * /api/movie/{id}:
  *   delete:
+ *     tags: [movie]
  *     summary: Supprime un film
  *     description: Supprime un film basé sur l'ID du film donné.
  *     parameters:

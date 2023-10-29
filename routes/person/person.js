@@ -3,6 +3,13 @@ const Joi = require('joi');
 const mysql = require('mysql');
 dotenv.config();
 
+/**
+ * @swagger
+ * tags:
+ *   name: person
+ *   description: Opérations liées aux personnes
+ */
+
 
 const connection = () => {
     return mysql.createConnection({
@@ -31,6 +38,7 @@ const convertDate = (date) => {
  * @swagger
  * /api/person:
  *   post:
+ *     tags: [person]
  *     summary: Crée une nouvelle personne
  *     description: Ajoute une nouvelle personne à la base de données.
  *     requestBody:
@@ -118,6 +126,7 @@ function createOne(request, response) {
  * @swagger
  * /api/person/{id}:
  *   get:
+ *     tags: [person]
  *     summary: Récupère les détails d'une personne spécifique
  *     description: Retourne les détails d'une personne par son ID.
  *     parameters:
@@ -193,6 +202,7 @@ function readOne(request, response) {
  * @swagger
  * /api/person:
  *   get:
+ *     tags: [person]
  *     summary: Récupère les détails de toutes les personnes
  *     description: Retourne les détails de toutes les personnes jusqu'à une limite spécifiée ou par défaut à 20.
  *     parameters:
@@ -273,6 +283,7 @@ function readAll(request, response) {
  * @swagger
  * /api/person/{id}:
  *   patch:
+ *     tags: [person]
  *     summary: Met à jour les détails d'une personne
  *     description: Met à jour les détails d'une personne spécifiée par son ID.
  *     parameters:
@@ -371,6 +382,7 @@ function updateOne(request, response) {
  * @swagger
  * /api/person/{id}:
  *   delete:
+ *     tags: [person]
  *     summary: Supprime une personne
  *     description: Supprime une personne spécifiée par son ID.
  *     parameters:

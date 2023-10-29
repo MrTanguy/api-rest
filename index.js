@@ -6,9 +6,19 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Mon API avec Swagger',
+      title: 'Swagger APIRest Tanguy',
       version: '1.0.0',
     },
+    tags: [
+        {
+          name: 'movie',
+          description: 'Opérations liées aux films'
+        },
+        {
+          name: 'person',
+          description: 'Opérations liées aux personnes'
+        }
+      ]
   },
   // Chemin vers les fichiers API
   apis: ['./routes/*/*.js'],

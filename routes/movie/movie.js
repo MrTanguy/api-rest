@@ -18,6 +18,20 @@ const connection = () => {
     });
 }
 
+const convertDate = (date) => {
+    let day = date.getDate()
+    if (day <= 9) {
+        day = `0${day}`
+    }
+    let month = date.getMonth() + 1
+    if (month <= 9) {
+        month = `0${month}`
+    }
+    const year = date.getFullYear()
+
+    return `${year}-${month}-${day}`
+}
+
 /**
  * @swagger
  * /api/movie:
@@ -268,7 +282,7 @@ function readOne (request, response) {
                         id_movie: result[0].id_movie,
                         name: result[0].name,
                         description: result[0].description,
-                        release_date: result[0].release_date
+                        release_date: convertDate(result[0].release_date)
                     }
 
                     let actors = []
@@ -464,7 +478,7 @@ function readAll (request, response) {
                                 id_movie: row.id_movie,
                                 name: row.name,
                                 description: row.description,
-                                release_date: row.release_date,
+                                release_date: convertDate(row.release_date),
                                 actors: [],
                                 realisators: []
                             };

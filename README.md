@@ -2,11 +2,16 @@
 
 Cette API a pour but de stocker des films et des personnes avec la possiblité d'organiser les personnes sous forme d'acteur et/ou réalisateur
 
+## Prérequis
+
+- nodejs : [installation](https://nodejs.org/en/download)
+- npm : Inclus dans l'installation de nodejs
+
 ## Déploiement de la BDD 
 
-Afin de pouvoir utilise l'API, il est nécessaire de la connecter à une BDD, pour ce faire, créer la BDD avec les requêtes suivantes : 
+Afin de pouvoir utilise l'API, il est nécessaire de la connecter à une BDD MySQL, pour ce faire, créer la BDD avec les requêtes suivantes : 
 
-`````sql`
+````
 CREATE DATABASE `api-rest`;
 
 CREATE TABLE `api-rest`.`person` (
@@ -34,4 +39,31 @@ CREATE TABLE `api-rest`.`role` (
 	FOREIGN KEY (`id_movie`) REFERENCES `movie`(`id_movie`) ON DELETE CASCADE ON UPDATE RESTRICT,
 	FOREIGN KEY (`id_person`) REFERENCES `person`(`id_person`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
-`````
+````
+## Installation 
+
+Cloner le repo 
+
+````
+git clone https://github.com/MrTanguy/api-rest.git
+cd api-rest
+git checkout dev 
+````
+
+## Installer les dépendances
+
+````
+npm install
+````
+
+## Démarrer le projet 
+
+````
+node .\index.js
+````
+
+## Documentation et tests 
+
+````
+http://localhost:3000/api-docs
+````

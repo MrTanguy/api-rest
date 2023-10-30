@@ -50,6 +50,14 @@ cd api-rest
 git checkout dev 
 ````
 
+Créer à la racine du projet, un fichier .env dans lequel il faut rentrer les identifiants de connexion à la BDD.
+
+````
+MYSQL_HOST = "localhost"
+MYSQL_USER = "root"
+MYSQL_PWD = ""
+````
+
 ## Installer les dépendances
 
 ````

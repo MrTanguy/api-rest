@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const Joi = require('joi');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 dotenv.config();
 
 /**
@@ -12,9 +12,10 @@ dotenv.config();
 
 const connection = () => {
     return mysql.createConnection({
-        host: process.env.MYSQL_HOST,
-        user: process.env.MYSQL_USER,
-        password: process.env.MYSQL_PWD
+        host: process.env.MYSQL_HOST || "host.docker.internal",
+            user: process.env.MYSQL_USER || "mysql",
+            password: process.env.MYSQL_PWD || "Password123",
+            database: "api-rest"
     });
 }
 

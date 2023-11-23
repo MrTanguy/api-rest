@@ -2,12 +2,14 @@
 
 Cette API a pour but de stocker des films et des personnes avec la possiblité d'organiser les personnes sous forme d'acteur et/ou réalisateur
 
-## Prérequis
+## Démarrer avec NodeJS
+
+### Prérequis
 
 - nodejs : [installation](https://nodejs.org/en/download)
 - npm : Inclus dans l'installation de nodejs
 
-## Déploiement de la BDD 
+### Déploiement de la BDD 
 
 Afin de pouvoir utilise l'API, il est nécessaire de la connecter à une BDD MySQL, pour ce faire, créer la BDD avec les requêtes suivantes : 
 
@@ -40,7 +42,7 @@ CREATE TABLE `api-rest`.`role` (
 	FOREIGN KEY (`id_person`) REFERENCES `person`(`id_person`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 ````
-## Installation 
+### Installation 
 
 Cloner le repo 
 
@@ -58,20 +60,42 @@ MYSQL_USER = "root"
 MYSQL_PWD = ""
 ````
 
-## Installer les dépendances
+### Installer les dépendances
 
 ````
 npm install
 ````
 
-## Démarrer le projet 
+### Démarrer le projet 
 
 ````
 node .\index.js
 ````
 
-## Documentation et tests 
+### Documentation et tests 
 
 ````
 http://localhost:3000/api-docs
 ````
+
+## Démarrer avec Docker
+
+- WSL2 : [installation](https://learn.microsoft.com/fr-fr/windows/wsl/install)
+- Docker : [installation](https://www.docker.com/products/docker-desktop/)
+- Postman : [installation](https://www.postman.com/downloads/)
+
+### Initialisation 
+
+Recupérer le repository via `git clone https://github.com/MrTanguy/api-rest.git`
+
+Se rendre dans le dossier `cd .\apt-rest\`
+
+Utiliser la branch dev `git checkout dev`
+
+Lancer la commande `docker-compose up`
+
+Se rendre sur `http://localhost:3000/api-docs/` pour découvrir les routes disponibles.
+
+Pour tester, utiliser postman avec les différentes requêtes possibles. 
+
+PS : Un nouveau container devrait apparaître dans Docker Desktop
